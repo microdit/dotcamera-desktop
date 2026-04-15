@@ -9,8 +9,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # 현재 버전 읽기
 CURRENT_VERSION=$(node -p "require('./package.json').version")
 
-echo "=== DotCamera 빌드 스크립트 ==="
-echo "현재 버전: $current_version"
+echo "=== AtomOppa 빌드 스크립트 ==="
+echo "현재 버전: $CURRENT_VERSION"
 
 # 버전 파싱
 MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
@@ -38,10 +38,11 @@ echo "DMG 빌드 시작..."
 npm run build
 
 # 결과 확인
-if [ -f "$SCRIPT_DIR/dist/DotCamera-$NEW_VERSION.dmg" ]; then
+PRODUCT_NAME=$(node -p "require('./package.json').productName || 'AtomOppa'")
+if [ -f "$SCRIPT_DIR/dist/${PRODUCT_NAME}-$NEW_VERSION.dmg" ]; then
     echo "=== 빌드 성공 ==="
-    echo "생성된 파일: dist/DotCamera-$NEW_VERSION.dmg"
-    ls -lh "$SCRIPT_DIR/dist/DotCamera-$NEW_VERSION.dmg"
+    echo "생성된 파일: dist/${PRODUCT_NAME}-$NEW_VERSION.dmg"
+    ls -lh "$SCRIPT_DIR/dist/${PRODUCT_NAME}-$NEW_VERSION.dmg"
 else
     echo "오류: 빌드된 파일을 찾을 수 없습니다."
     exit 1

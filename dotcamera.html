@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DotCamera</title>
+    <title>AtomOppa</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
@@ -13,14 +13,74 @@
             background: #000;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
+        #title-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: rgba(0,0,0,0.3);
+            -webkit-app-region: drag;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            z-index: 10000;
+            -webkit-user-select: none;
+        }
+        #title-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: rgba(0,0,0,0.3);
+            -webkit-app-region: drag;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            z-index: 10000;
+            -webkit-user-select: none;
+        }
+        #title-bar-title {
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .context-menu {
+            display: none;
+            position: fixed;
+            background: rgba(40, 40, 40, 0.95);
+            border-radius: 8px;
+            padding: 5px 0;
+            min-width: 150px;
+            z-index: 20000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .menu-item {
+            color: #fff;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .menu-separator {
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 5px 0;
+        }
         canvas {
             display: block;
             width: 100%;
             height: 100%;
         }
         #status-msg {
+            display: none; /* 화면에 표시 안 함 */
             position: absolute;
-            top: 20px;
+            top: 50px;
             left: 20px;
             color: #fff;
             background: rgba(0,0,0,0.5);
@@ -29,26 +89,19 @@
             pointer-events: none;
             z-index: 1000;
         }
-        #error-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,0,0,0.2);
-            color: #fff;
-            padding: 40px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            display: none;
-            z-index: 9999;
-            overflow-y: auto;
-        }
     </style>
 </head>
 <body>
+    <div id="title-bar">
+        <span id="title-bar-title">AtomOppa</span>
+    </div>
+    <div id="context-menu" class="context-menu">
+        <div class="menu-item" id="menu-minimize">창 최소화</div>
+        <div class="menu-item" id="menu-maximize">창 최대화</div>
+        <div class="menu-separator"></div>
+        <div class="menu-item" id="menu-close">창 닫기</div>
+    </div>
     <div id="status-msg">초기화 중...</div>
-    <div id="error-overlay"></div>
     <canvas id="c"></canvas>
     
     <script>
@@ -63,7 +116,8 @@
         const status = document.getElementById('status-msg');
         function log(msg) {
             console.log(msg);
-            status.innerHTML = msg;
+            // 화면에 표시 안 함 (개발자 도구에서만 확인 가능)
+            // status.innerHTML = msg;
         }
     </script>
     <script src="swissgl.js"></script>
@@ -223,6 +277,41 @@
         }
 
         const demo = new DotCamera(glsl);
+
+        // Right-click context menu (custom HTML menu)
+        const contextMenu = document.getElementById('context-menu');
+        
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = e.clientX + 'px';
+            contextMenu.style.top = e.clientY + 'px';
+        });
+        
+        document.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+        });
+        
+        document.getElementById('menu-minimize').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const {ipcRenderer} = require('electron');
+            ipcRenderer.send('window-minimize');
+            contextMenu.style.display = 'none';
+        });
+        
+        document.getElementById('menu-maximize').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const {ipcRenderer} = require('electron');
+            ipcRenderer.send('window-maximize');
+            contextMenu.style.display = 'none';
+        });
+        
+        document.getElementById('menu-close').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const {ipcRenderer} = require('electron');
+            ipcRenderer.send('window-close');
+            contextMenu.style.display = 'none';
+        });
 
         function render(t) {
             demo.frame(glsl, {canvasSize: [canvas.width, canvas.height]});

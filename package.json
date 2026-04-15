@@ -1,0 +1,36 @@
+{
+  "name": "dotcamera-desktop",
+  "version": "1.0.11",
+  "description": "DotCamera Desktop App - Webcam dot filter",
+  "main": "electron_main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac"
+  },
+  "author": "DotCamera",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^41.2.0",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.atom.dotcamera",
+    "productName": "DotCamera",
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.photography",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "extendInfo": {
+        "NSCameraUsageDescription": "도트카메라 앱에서 카메라를 사용합니다.",
+        "NSMicrophoneUsageDescription": "영상 녹화를 위해 마이크를 사용합니다."
+      }
+    },
+    "files": [
+      "electron_main.js",
+      "dotcamera.html",
+      "swissgl.js"
+    ]
+  }
+}
